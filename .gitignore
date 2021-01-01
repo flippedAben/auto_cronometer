@@ -1,1 +1,5 @@
 venv/**
+data/**
+creds.py
+geckodriver*
+__pycache__/**
