@@ -13,12 +13,12 @@ WAIT_SECONDS = 3
 
 
 def login(driver):
-    import creds
+    import secrets
     driver.get('https://cronometer.com/login/')
     user_ele = driver.find_element_by_name('username')
     pass_ele = driver.find_element_by_name('password')
-    user_ele.send_keys(creds.u)
-    pass_ele.send_keys(creds.p)
+    user_ele.send_keys(secrets.u)
+    pass_ele.send_keys(secrets.p)
 
     submit_button = driver.find_element_by_id('login-button')
     submit_button.click()

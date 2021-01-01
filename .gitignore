@@ -1,5 +1,7 @@
 venv/**
 data/**
-creds.py
+secrets.py
+client_id.json
+token.pickle
 geckodriver*
 __pycache__/**
