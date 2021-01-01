@@ -58,29 +58,32 @@ def clean_data(all_ing_pd):
     all_ing_pd.rename(columns={'Weight': 'Weight (g)'}, inplace=True)
 
 
-all_ing_pd = pd.read_csv('data/ingredients.csv')
-clean_data(all_ing_pd)
+def get_grocery_list():
+    all_ing_pd = pd.read_csv('data/ingredients.csv')
 
-# Categorize ingredients (Description) by string up to the first comma
-all_ing_pd = all_ing_pd.set_index('Description')
-group_ing_df = all_ing_pd.groupby(lambda index: index.split(',')[0])
+    # Only look at favorited recipes
+    # "Favorite" encodes the information: "I'm making the recipe this week"
+    all_ing_pd = all_ing_pd.loc[all_ing_pd['Favorite'] == 1]
 
-# Ask user to use a single type of ingredient if possible
-info_multiple_versions(group_ing_df)
+    clean_data(all_ing_pd)
 
-# Ask user to only use one kind of unit per ingredient
-error_multiple_units(group_ing_df)
+    # Categorize ingredients (Description) by string up to the first comma
+    all_ing_pd = all_ing_pd.set_index('Description')
+    group_ing_df = all_ing_pd.groupby(lambda index: index.split(',')[0])
 
-# Create aggregated grocery list
-group_desc_df = all_ing_pd.groupby('Description')
-grocery_list = []
-for key, df in group_desc_df:
-    amount = round(pd.to_numeric(df['Amount']).sum(), 2)
-    unit = df['Unit'].unique()[0]
-    grocery_list.append([key, amount, unit, 0])
+    # Ask user to use a single type of ingredient if possible
+    info_multiple_versions(group_ing_df)
 
-groceries_df = pd.DataFrame(grocery_list)
-groceries_df.to_csv(
-    'data/grocery_list.csv',
-    header=['Name', 'Amount', 'Unit', 'Order'],
-    index=False)
+    # Ask user to only use one kind of unit per ingredient
+    error_multiple_units(group_ing_df)
+
+    # Create aggregated grocery list
+    group_desc_df = all_ing_pd.groupby('Description')
+    grocery_list = []
+    grocery_list.append(['Item', 'Amount', 'Unit', 'Order'])
+    for key, df in group_desc_df:
+        amount = round(pd.to_numeric(df['Amount']).sum(), 2)
+        unit = df['Unit'].unique()[0]
+        grocery_list.append([key, amount, unit])
+
+    return grocery_list

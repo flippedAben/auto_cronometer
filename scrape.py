@@ -74,6 +74,15 @@ def scrape_recipe_ingredients(driver):
             recipe_title = driver.find_element_by_class_name('admin-food-name')
             print(f'{recipe_title.text} pane loaded')
 
+            is_favorite = True
+            # Is the recipe favorited/starred?
+            star_div = driver.find_element_by_class_name('GHDCC5OBEO')
+            star_img = star_div.find_element_by_tag_name('img')
+            star_src = star_img.get_attribute('src')
+            if 'fav_star_unselected' in star_src:
+                is_favorite = False
+
+            # Add ingredients
             ingredients = driver.find_element_by_class_name('GHDCC5OBPO')
             ingredients_table_div = ingredients.find_element_by_class_name('GHDCC5OBKO')
             ingredients_table = ingredients_table_div.find_elements_by_tag_name('tr')
@@ -83,9 +92,11 @@ def scrape_recipe_ingredients(driver):
                     for td
                     in ingredients_table[0].find_elements_by_tag_name('td')]
                 headers.append('Recipe')
+                headers.append('Favorite')
             for raw_row in ingredients_table[1:]:
                 row = [td.text for td in raw_row.find_elements_by_tag_name('td')]
                 row.append(recipe_title.text)
+                row.append(int(is_favorite))
                 grocery_list_data.append(row)
     except TimeoutException:
         print('An element took too long to load. Re run the script.')
