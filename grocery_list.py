@@ -18,7 +18,7 @@ def info_multiple_versions(group_ing_df):
             df = df[['Recipe']]
             if df.shape[0] > 1:
                 if df.index.nunique() > 1:
-                    print(f'"[Info] {key}" has multiple versions:')
+                    print(f'[Info] "{key}" has multiple versions:')
                     print(df)
                     print()
 
@@ -75,10 +75,10 @@ def get_grocery_list():
     info_multiple_versions(group_ing_df)
 
     # Ask user to only use one kind of unit per ingredient
-    error_multiple_units(group_ing_df)
+    group_desc_df = all_ing_pd.groupby('Description')
+    error_multiple_units(group_desc_df)
 
     # Create aggregated grocery list
-    group_desc_df = all_ing_pd.groupby('Description')
     grocery_list = []
     grocery_list.append(['Item', 'Amount', 'Unit', 'Order'])
     for key, df in group_desc_df:
