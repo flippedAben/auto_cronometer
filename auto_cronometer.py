@@ -65,34 +65,36 @@ def iterate_over_recipes(driver, function):
                 break
 
         recipe_div = driver.find_element_by_class_name('GHDCC5OBJRB')
-        recipes = recipe_div.find_elements_by_class_name('gwt-Anchor')
-        for recipe in recipes:
+        recipes = recipe_div.find_elements_by_tag_name('a')
+        for i, recipe in enumerate(recipes):
+            # Hack: the recipe element goes stale quickly, so get it again
+            recipe = recipe_div.find_elements_by_tag_name('a')[i]
+            props = {
+                'name': recipe.text
+            }
             robust_click(recipe, driver)
             WebDriverWait(driver, WAIT_SECONDS).until(
                 EC.presence_of_element_located((By.CLASS_NAME, 'admin-food-name'))
             )
-            is_favorite = True
+
             # Is the recipe favorited/starred?
+            props['is_favorite'] = True
             star_div = driver.find_element_by_class_name('GHDCC5OBEO')
             star_img = star_div.find_element_by_tag_name('img')
             star_src = star_img.get_attribute('src')
             if 'fav_star_unselected' in star_src:
-                is_favorite = False
-            props = {
-                'recipe': recipe,
-                'is_favorite': is_favorite
-            }
-            recipe_data[recipe.text] = function(driver, props)
+                props['is_favorite'] = False
+
+            recipe_data[props['name']] = function(driver, props)
     except TimeoutException:
         print('An element took too long to load. Re run the script.')
 
     return recipe_data
 
 
-def scrape_recipe_ingredients(driver, props):
-    recipe = props['recipe']
-    print(recipe.text)
-    is_favorite = props['is_favorite']
+def scrape_recipe_ingredients(driver, recipe_props):
+    print(recipe_props['name'])
+    is_favorite = recipe_props['is_favorite']
 
     grocery_list_data = []
     headers = []
@@ -111,7 +113,7 @@ def scrape_recipe_ingredients(driver, props):
         grocery_list_data.append(headers)
     for raw_row in ingredients_table[1:]:
         row = [td.text for td in raw_row.find_elements_by_tag_name('td')]
-        row.append(recipe.text)
+        row.append(recipe_props['name'])
         row.append(int(is_favorite))
         grocery_list_data.append(row)
 
@@ -138,13 +140,12 @@ def scrape_to_csv():
     all_ing_pd.to_csv('data/ingredients.csv')
 
 
-def add_recipe_to_diary(driver, props):
-    recipe = props['recipe']
+def add_recipe_to_diary(driver, recipe_props):
     is_favorite = props['is_favorite']
 
     # Click add to diary
     if is_favorite:
-        print(recipe.text)
+        print(recipe_props['name'])
         add_to_diary_button = driver.find_element_by_class_name('GHDCC5OBKN')
         robust_click(add_to_diary_button, driver)
         try:
