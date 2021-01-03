@@ -71,25 +71,31 @@ def iterate_over_recipes(driver, function):
             WebDriverWait(driver, WAIT_SECONDS).until(
                 EC.presence_of_element_located((By.CLASS_NAME, 'admin-food-name'))
             )
-            print(f'{recipe.text}')
-            recipe_data[recipe.text] = function(driver, recipe)
+            is_favorite = True
+            # Is the recipe favorited/starred?
+            star_div = driver.find_element_by_class_name('GHDCC5OBEO')
+            star_img = star_div.find_element_by_tag_name('img')
+            star_src = star_img.get_attribute('src')
+            if 'fav_star_unselected' in star_src:
+                is_favorite = False
+            props = {
+                'recipe': recipe,
+                'is_favorite': is_favorite
+            }
+            recipe_data[recipe.text] = function(driver, props)
     except TimeoutException:
         print('An element took too long to load. Re run the script.')
 
     return recipe_data
 
 
-def scrape_recipe_ingredients(driver, recipe):
+def scrape_recipe_ingredients(driver, props):
+    recipe = props['recipe']
+    print(recipe.text)
+    is_favorite = props['is_favorite']
+
     grocery_list_data = []
     headers = []
-
-    is_favorite = True
-    # Is the recipe favorited/starred?
-    star_div = driver.find_element_by_class_name('GHDCC5OBEO')
-    star_img = star_div.find_element_by_tag_name('img')
-    star_src = star_img.get_attribute('src')
-    if 'fav_star_unselected' in star_src:
-        is_favorite = False
 
     # Add ingredients
     ingredients = driver.find_element_by_class_name('GHDCC5OBPO')
@@ -132,12 +138,25 @@ def scrape_to_csv():
     all_ing_pd.to_csv('data/ingredients.csv')
 
 
-def add_recipe_to_diary(driver, recipe):
-    print(recipe.text)
-    # TODO
-    # Click "add to diary"
-    # Wait for pop up
-    # Click "add"
+def add_recipe_to_diary(driver, props):
+    recipe = props['recipe']
+    is_favorite = props['is_favorite']
+
+    # Click add to diary
+    if is_favorite:
+        print(recipe.text)
+        add_to_diary_button = driver.find_element_by_class_name('GHDCC5OBKN')
+        robust_click(add_to_diary_button, driver)
+        try:
+            # Wait for add modal to show
+            WebDriverWait(driver, WAIT_SECONDS).until(
+                EC.presence_of_element_located((By.CLASS_NAME, 'btn-orange-flat'))
+            )
+            # Add recipe
+            add_recipe_button = driver.find_element_by_class_name('btn-orange-flat')
+            robust_click(add_recipe_button, driver)
+        except TimeoutException:
+            print('The "add to diary" modal took too long to load. Re run the script.')
     return 0
 
 
