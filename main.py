@@ -3,10 +3,9 @@ import argparse
 
 import auto_cronometer
 import cloudify
-import secrets
 
 
-description_help ="""
+description_help = """
 Automate food/nutrition bookkeeping tasks.
 
 Supported commands

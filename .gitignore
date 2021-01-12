@@ -5,3 +5,4 @@ client_id.json
 token.pickle
 geckodriver*
 __pycache__/**
+auto-cm
