@@ -1,14 +1,6 @@
 # Automatic Cronometer
 
-`auto-cm` is a CLI tools for working with Cronometer.
-
-## Grocery list creation with nutrition info
-
-The command: `auto-cm`
-
-1. Scrapes Cronometer for your recipes.
-2. Adds all starred recipes to today's diary
-3. Uploads the grocery list to a Google Sheet on the cloud.
+A CLI tool for working with Cronometer.
 
 ## Assumptions
 
@@ -19,20 +11,26 @@ The command: `auto-cm`
 
 The setup takes quite a bit of effort.
 
-### Create configuration files
+### Download `geckodriver`
 
-#### `secrets.py`
+- Get the latest release from [the GitHub page](https://github.com/mozilla/geckodriver/releases).
+- `tar xzf <the geckodriver tar.gz>`
+
+### Generate `client_id.json`
+
+Basically follow the instructions in the Quickstart of the Google Sheets API v4 page.
+
+### Create `config.sh`
 
 This file should look like this:
 
 ```python3
-u = <Cronometer username>
-p = <Cronometer password>
-sheet_id = <Existing Google Sheet that will contain the grocery list>
+geckodriver_path=<path to geckodriver>
+cronometer_user=<cronometer username>
+cronometer_pass=<cronometer password>
+google_sheets_api_sheet_id=<existing google sheet that will contain the grocery list>
+google_sheets_api_client_id_path=<path to client_id.json>
+google_sheets_api_token_pickle_path=<path to token.pickle>
 ```
 
 Don't share it with anyone. Apply your own security measures.
-
-#### `client_id.json`
-
-Basically follow the instructions in the Quickstart of the Google Sheets API v4 page.

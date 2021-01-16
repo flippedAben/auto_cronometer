@@ -11,8 +11,8 @@ import os
 class AutoCronometer():
     def __init__(self):
         self.driver = webdriver.Firefox(
-            executable_path='./gecko/geckodriver',
-            log_path='./gecko/geckodriver.log')
+            executable_path=os.environ.get('geckodriver_path'),
+            log_path=os.environ.get('geckodriver_log_path'))
 
     def __enter__(self):
         return self

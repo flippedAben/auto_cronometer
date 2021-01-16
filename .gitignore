@@ -1,6 +1,4 @@
-secrets.sh
-client_id.json
-token.pickle
+config.sh
 data/**
-gecko/**
+setup_files/**
 __pycache__/**
