@@ -30,6 +30,9 @@ class AutoCronometer():
         submit_button = self.driver.find_element_by_id('login-button')
         submit_button.click()
 
+        # Wait for login to bring us to the main website
+        self.wait_on_ele_id('navArea')
+
     def wait_on_ele_id(self, id_name):
         WebDriverWait(self.driver, 3).until(
             EC.presence_of_element_located((
@@ -55,7 +58,56 @@ class AutoCronometer():
             dialog = self.driver.find_element_by_class_name('popupContent')
             cancel_button = dialog.find_element_by_tag_name('button')
             cancel_button.click()
-            print('Closed subscription popup dialog!')
+            print('[Info] Closed subscription popup dialog!')
 
             # Retry
             element.click()
+
+    def go_to_recipes_tab(self):
+        self.driver.get('https://cronometer.com/#foods')
+        self.wait_on_ele_class('gwt-DecoratedTabPanel')
+
+        tabs = self.driver.find_elements_by_class_name(
+            'gwt-TabBarItem-wrapper')
+        for tab in tabs:
+            tab_label = tab.find_element_by_class_name('gwt-Label')
+            if tab_label.text.endswith('Recipes'):
+                self.robust_click(tab_label)
+                break
+
+    def get_recipes_tab_page(self):
+        custom_recipes_h = self.driver.find_element_by_tag_name('h2')
+        parent = custom_recipes_h.find_element_by_xpath('..')
+        return parent
+
+    def get_recipes_list_items(self):
+        parent = self.get_recipes_tab_page()
+        temp = parent.find_element_by_tag_name('div')
+        temp = temp.find_element_by_tag_name('div')
+        temp = temp.find_element_by_tag_name('div')
+        recipes_list = temp.find_element_by_tag_name('tbody')
+        recipes_list_items = recipes_list.find_elements_by_tag_name('a')
+        return recipes_list_items
+
+    def get_recipe_details_pane(self, recipe_list_item):
+        # Click on the recipe list item to show the pane
+        self.robust_click(recipe_list_item)
+        self.wait_on_ele_class('admin-food-name')
+
+        # Get the details
+        parent = self.get_recipes_tab_page()
+        recipe_details_pane = parent.find_element_by_class_name(
+            'admin-food-editor-content-area')
+        return recipe_details_pane
+
+    def get_recipe_title(self, recipe_details_pane):
+        admin_food_name = recipe_details_pane.find_element_by_class_name(
+            'admin-food-name')
+        recipe_title_div = admin_food_name.find_element_by_xpath('..')
+        return recipe_title_div
+
+    def is_recipe_favorite(self, recipe_details_pane):
+        recipe_title_div = self.get_recipe_title(recipe_details_pane)
+        star_img = recipe_title_div.find_element_by_tag_name('img')
+        star_src = star_img.get_attribute('src')
+        return 'fav_star_v2' in star_src

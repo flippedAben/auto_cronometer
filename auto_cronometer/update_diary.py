@@ -1,42 +1,31 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-import csv
-import fractions
-import json
 import os
 
-
-# def add_recipe_to_diary(driver, recipe_props):
-    # is_favorite = recipe_props['is_favorite']
-
-    # # Click add to diary
-    # if is_favorite:
-        # print(recipe_props['name'])
-        # add_to_diary_button = driver.find_element_by_class_name('GHDCC5OBKN')
-        # robust_click(add_to_diary_button, driver)
-        # try:
-            # # Wait for add modal to show
-            # WebDriverWait(driver, WAIT_SECONDS).until(
-                # EC.presence_of_element_located((
-                    # By.CLASS_NAME,
-                    # 'btn-orange-flat'))
-            # )
-            # # Add recipe
-            # add_recipe_button = driver.find_element_by_class_name(
-                # 'btn-orange-flat')
-            # robust_click(add_recipe_button, driver)
-        # except TimeoutException:
-            # print('The "add to diary" modal took too long to load.')
-    # return 0
+import auto_cronometer.auto_cm as auto_cm
 
 
-# TODO reimplement this
-# def add_starred_recipes_to_diary():
-    # # Enable headless Firefox
-    # os.environ['MOZ_HEADLESS'] = '1'
+def add_starred_recipes_to_diary():
+    # Enable headless Firefox
+    os.environ['MOZ_HEADLESS'] = '1'
 
-    # print('Adding favorite/starred recipes to today\'s diary entry...')
-    # with webdriver.Firefox(executable_path='./geckodriver') as driver:
-        # login(driver)
-        # iterate_over_recipes(driver, add_recipe_to_diary)
-    # print()
+    with auto_cm.AutoCronometer() as ac:
+        ac.login()
+        ac.go_to_recipes_tab()
+
+        print('Adding favorite/starred recipes to today\'s diary entry...')
+        recipes = ac.get_recipes_list_items()
+        for _, recipe in enumerate(recipes):
+            details = ac.get_recipe_details_pane(recipe)
+            if ac.is_recipe_favorite(details):
+                print(ac.get_recipe_title(details).text)
+
+                # Should be the first button found in the details pane
+                add_to_diary_button = details.find_element_by_tag_name(
+                    'button')
+                ac.robust_click(add_to_diary_button)
+
+                # Add recipe
+                ac.wait_on_ele_class('btn-orange-flat')
+                add_recipe_button = ac.driver.find_element_by_class_name(
+                    'btn-orange-flat')
+                ac.robust_click(add_recipe_button)
+    print()
