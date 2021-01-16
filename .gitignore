@@ -1,4 +1,4 @@
 config.sh
 data/**
 setup_files/**
-__pycache__/**
+*/__pycache__/**
