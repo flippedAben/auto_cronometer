@@ -3,6 +3,6 @@ data/**
 secrets.py
 client_id.json
 token.pickle
-geckodriver*
+gecko/**
 __pycache__/**
 auto-cm
