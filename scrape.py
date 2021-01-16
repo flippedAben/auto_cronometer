@@ -1,11 +1,10 @@
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 import csv
 import fractions
 import json
 import os
 
-import auto_cronometer as acm
+import auto_cronometer
 
 
 def parse_table(table):
@@ -65,22 +64,20 @@ def scrape_recipes():
     os.environ['MOZ_HEADLESS'] = '1'
 
     # TODO this is kind of slow. See if you can make it faster.
+    with auto_cronometer.AutoCronometer() as ac:
+        ac.login()
+        ac.wait_on_ele_id('navArea')
+        ac.driver.get('https://cronometer.com/#foods')
 
-    with webdriver.Firefox(executable_path='./geckodriver') as driver:
-        acm.login(driver)
-
-        acm.wait_on_element(driver, (By.ID, "navArea"))
-        driver.get('https://cronometer.com/#foods')
-
-        acm.wait_on_element(driver, (By.CLASS_NAME, "gwt-DecoratedTabPanel"))
-        tabs = driver.find_elements_by_class_name('gwt-TabBarItem-wrapper')
+        ac.wait_on_ele_class('gwt-DecoratedTabPanel')
+        tabs = ac.driver.find_elements_by_class_name('gwt-TabBarItem-wrapper')
         for tab in tabs:
             tab_label = tab.find_element_by_class_name('gwt-Label')
             if tab_label.text.endswith('Recipes'):
-                acm.robust_click(tab_label, driver)
+                ac.robust_click(tab_label)
                 break
 
-        custom_recipes_h = driver.find_element_by_tag_name('h2')
+        custom_recipes_h = ac.driver.find_element_by_tag_name('h2')
         parent = custom_recipes_h.find_element_by_xpath('..')
         temp = parent.find_element_by_tag_name('div')
         temp = temp.find_element_by_tag_name('div')
@@ -92,8 +89,8 @@ def scrape_recipes():
             # Hack: the recipe element goes stale quickly, so get it again
             # Maybe we don't need the hack anymore?
             # recipe = recipe_div.find_elements_by_tag_name('a')[i]
-            acm.robust_click(recipe, driver)
-            acm.wait_on_element(driver, (By.CLASS_NAME, 'admin-food-name'))
+            ac.robust_click(recipe)
+            ac.wait_on_ele_class('admin-food-name')
 
             # Is the recipe favorited/starred?
             recipe_details = parent.find_element_by_class_name(
