@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import argparse
 
-import scrape
-import update_diary
-import cloudify
+import auto_cronometer.scrape as scrape
+import auto_cronometer.update_diary as update_diary
+import auto_cronometer.cloudify as cloudify
 
 
 description_help = """

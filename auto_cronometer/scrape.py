@@ -1,10 +1,9 @@
-from selenium import webdriver
 import csv
 import fractions
 import json
 import os
 
-import auto_cronometer
+import auto_cronometer.auto_cm as auto_cm
 
 
 def parse_table(table):
@@ -64,7 +63,7 @@ def scrape_recipes():
     os.environ['MOZ_HEADLESS'] = '1'
 
     # TODO this is kind of slow. See if you can make it faster.
-    with auto_cronometer.AutoCronometer() as ac:
+    with auto_cm.AutoCronometer() as ac:
         ac.login()
         ac.wait_on_ele_id('navArea')
         ac.driver.get('https://cronometer.com/#foods')

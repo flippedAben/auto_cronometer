@@ -1,8 +1,6 @@
-venv/**
-data/**
-secrets.py
+secrets.sh
 client_id.json
 token.pickle
+data/**
 gecko/**
 __pycache__/**
-auto-cm

@@ -5,7 +5,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import (
     ElementClickInterceptedException,
 )
-import secrets
+import os
 
 
 class AutoCronometer():
@@ -24,8 +24,8 @@ class AutoCronometer():
         self.driver.get('https://cronometer.com/login/')
         user_ele = self.driver.find_element_by_name('username')
         pass_ele = self.driver.find_element_by_name('password')
-        user_ele.send_keys(secrets.u)
-        pass_ele.send_keys(secrets.p)
+        user_ele.send_keys(os.environ.get('cronometer_user'))
+        pass_ele.send_keys(os.environ.get('cronometer_pass'))
 
         submit_button = self.driver.find_element_by_id('login-button')
         submit_button.click()
