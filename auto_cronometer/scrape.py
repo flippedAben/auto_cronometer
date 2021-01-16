@@ -82,6 +82,7 @@ def scrape_recipes():
         ac.login()
         ac.go_to_recipes_tab()
 
+        print('Scraping recipes and storing data...')
         recipes = ac.get_recipes_list_items()
         for _, recipe in enumerate(recipes):
             # Hack: the recipe element goes stale quickly, so get it again
