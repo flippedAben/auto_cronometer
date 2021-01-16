@@ -40,25 +40,31 @@ def get_service():
     return service
 
 
-def get_ordering(sheet):
+def get_metadata(sheet):
     """
-    Retrieve the order in which we should buy items.
+    Retrieve meta data on the groceries.
     """
-    sheet_name = 'Order'
+    sheet_name = 'Metadata'
 
     result = sheet.values().get(
         spreadsheetId=SHEET_ID,
-        range=f'{sheet_name}!A:B',
+        range=f'{sheet_name}!A:C',
     ).execute()
 
     values = result['values']
-    ordering = {}
-    for i, (item, order) in enumerate(values, start=1):
-        ordering[item] = [f'={sheet_name}!B{i}', float(order)]
-    return ordering
+    metadata = {}
+    for i, row in enumerate(values[1:], start=2):
+        item = row[0]
+        order = row[1]
+        # Omitted value implies the item is not in stock
+        in_stock = False
+        if len(row) == 3:
+            in_stock = bool(row[2])
+        metadata[item] = [f'={sheet_name}!B{i}', float(order), in_stock]
+    return metadata
 
 
-def update_groceries(sheet, ordering):
+def update_groceries(sheet, metadata):
     """
     Put grocery list data on the cloud.
     """
@@ -71,17 +77,30 @@ def update_groceries(sheet, ordering):
         body={}
     ).execute()
 
-    # Read the local grocery list from ingredients.csv (recently scraped)
+    # Read the local grocery list from ingredients.csv files
+    # Ignore the header
     data = grocery_list.get_grocery_list()[1:]
 
-    # Apply an ordering if it exists
+    # Ignore items that are "in stock" (i.e. we already have enough)
+    out_of_stock_data = []
     for row in data:
         item = row[0]
-        if item in ordering:
-            row.append(ordering[item][1])
-    data.sort(key=lambda x: x[3])
+        if item in metadata:
+            if not metadata[item][2]:
+                out_of_stock_data.append(row)
+        else:
+            print(f'{item} is not in the Metadata sheet. Add it.')
+
+    # Apply an ordering if it exists
+    for row in out_of_stock_data:
+        item = row[0]
+        if item in metadata:
+            row.append(metadata[item][1])
+
+    # Sort by order
+    out_of_stock_data.sort(key=lambda x: x[3])
     body = {
-        'values': data
+        'values': out_of_stock_data
     }
     sheet.values().update(
         spreadsheetId=SHEET_ID,
@@ -98,7 +117,7 @@ def update_groceries(sheet, ordering):
                     'dimensions': {
                         'dimension': 'COLUMNS',
                         'startIndex': 0,
-                        'endIndex': len(data[0])
+                        'endIndex': len(out_of_stock_data[0])
                     }
                 }
             }
@@ -112,5 +131,5 @@ def update_groceries(sheet, ordering):
 
 def upload_grocery_list():
     sheet = get_service().spreadsheets()
-    ordering = get_ordering(sheet)
-    update_groceries(sheet, ordering)
+    metadata = get_metadata(sheet)
+    update_groceries(sheet, metadata)
