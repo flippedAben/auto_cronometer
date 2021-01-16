@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import argparse
 
-import auto_cronometer
+import scrape
+import update_diary
 import cloudify
 
 
@@ -26,9 +27,9 @@ def main():
     )
     args = parser.parse_args()
     if args.command == 'scrape':
-        auto_cronometer.scrape_to_csv()
+        scrape.scrape_recipes()
     elif args.command == 'diary':
-        auto_cronometer.add_starred_recipes_to_diary()
+        update_diary.add_starred_recipes_to_diary()
     elif args.command == 'cloud':
         cloudify.upload_grocery_list()
     else:

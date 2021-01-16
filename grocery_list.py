@@ -1,6 +1,4 @@
 import pandas as pd
-import fractions
-from collections import defaultdict
 
 
 def info_multiple_versions(group_ing_df):
@@ -30,7 +28,7 @@ def error_multiple_units(group_ing_df):
         if df.shape[0] > 1:
             if df['Unit'].nunique() > 1:
                 print('[Error] Multiple types of unit per ingredient found.')
-                print('[Error] Until I implement unit conversion, this will be an error.')
+                print('[Error] Until I implement unit conversion.')
                 print()
                 multiple_units_exists = True
                 break
@@ -47,25 +45,12 @@ def error_multiple_units(group_ing_df):
         exit(1)
 
 
-def clean_data(all_ing_pd):
-    # Some amounts are in fractions (e.g. 1/2)
-    all_ing_pd[['Amount']] = all_ing_pd[['Amount']].applymap(lambda x:
-            float(fractions.Fraction(x)))
-    # Weight has the unit in it, so take it out...
-    all_ing_pd[['Weight']] = all_ing_pd[['Weight']].applymap(lambda x:
-            float(x.split(' ')[0]))
-    # ... and put it in the column name
-    all_ing_pd.rename(columns={'Weight': 'Weight (g)'}, inplace=True)
-
-
 def get_grocery_list():
     all_ing_pd = pd.read_csv('data/ingredients.csv')
 
     # Only look at favorited recipes
     # "Favorite" encodes the information: "I'm making the recipe this week"
     all_ing_pd = all_ing_pd.loc[all_ing_pd['Favorite'] == 1]
-
-    clean_data(all_ing_pd)
 
     # Categorize ingredients (Description) by string up to the first comma
     all_ing_pd = all_ing_pd.set_index('Description')

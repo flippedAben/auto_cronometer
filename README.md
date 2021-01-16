@@ -4,11 +4,16 @@
 
 ## Grocery list creation with nutrition info
 
-The command: `auto-cm scrape && auto-cm diary && auto-cm cloud`.
+The command: `auto-cm`
 
 1. Scrapes Cronometer for your recipes.
 2. Adds all starred recipes to today's diary
 3. Uploads the grocery list to a Google Sheet on the cloud.
+
+## Assumptions
+
+- Recipe names are unique (after converting to lower case and removing symbols
+  and converting white space to underscore)
 
 ## Setup
 
