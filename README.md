@@ -59,5 +59,5 @@ Don't share it with anyone. Apply your own security measures.
 
 ```bash
 source config.sh
-auto_cronometer -h
+autocm -h
 ```
