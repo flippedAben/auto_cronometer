@@ -59,5 +59,8 @@ Don't share it with anyone. Apply your own security measures.
 
 ```bash
 source config.sh
+poetry run main
+
+# or if you have the package installed
 autocm -h
 ```
