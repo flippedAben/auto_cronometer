@@ -6,6 +6,10 @@ from selenium.common.exceptions import (
     ElementClickInterceptedException,
 )
 import os
+import logging
+
+logging.basicConfig(level=logging.INFO)
+_logger = logging.getLogger(__name__)
 
 
 class AutoCronometer():
@@ -32,6 +36,7 @@ class AutoCronometer():
 
         # Wait for login to bring us to the main website
         self.wait_on_ele_id('navArea')
+        _logger.info('Logged in')
 
     def wait_on_ele_id(self, id_name):
         WebDriverWait(self.driver, 3).until(
@@ -52,13 +57,14 @@ class AutoCronometer():
         to click the given element.
         """
         try:
+            log_attrs(element, 'Clicking element')
             element.click()
         except ElementClickInterceptedException:
             # Close the dialog
             dialog = self.driver.find_element_by_class_name('popupContent')
             cancel_button = dialog.find_element_by_tag_name('button')
             cancel_button.click()
-            print('[Info] Closed subscription popup dialog!')
+            _logger.info('Closed subscription popup dialog!')
 
             # Retry
             element.click()
@@ -76,16 +82,22 @@ class AutoCronometer():
                 break
 
     def get_recipes_tab_page(self):
+        # This should get the entire page under "Custom Recipes"
         custom_recipes_h = self.driver.find_element_by_tag_name('h2')
+        log_attrs(custom_recipes_h, 'custom_recipes_h')
         parent = custom_recipes_h.find_element_by_xpath('..')
-        return parent
+        log_attrs(parent, 'parent')
+        grand_parent = parent.find_element_by_xpath('..')
+        log_attrs(grand_parent, 'grand_parent')
+        return grand_parent
 
     def get_recipes_list_items(self):
         parent = self.get_recipes_tab_page()
-        temp = parent.find_element_by_tag_name('div')
+        temp = parent.find_element_by_class_name('inline')
         temp = temp.find_element_by_tag_name('div')
         temp = temp.find_element_by_tag_name('div')
         recipes_list = temp.find_element_by_tag_name('tbody')
+        log_attrs(recipes_list, 'recipes_list')
         recipes_list_items = recipes_list.find_elements_by_tag_name('a')
         return recipes_list_items
 
@@ -111,3 +123,9 @@ class AutoCronometer():
         star_img = recipe_title_div.find_element_by_tag_name('img')
         star_src = star_img.get_attribute('src')
         return 'fav_star_v2' in star_src
+
+
+def log_attrs(ele, name):
+    cls = ele.get_attribute('class')
+    style = ele.get_attribute('style')
+    _logger.info(f'{name}: {cls} | {style}')
