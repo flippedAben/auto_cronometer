@@ -36,7 +36,7 @@ def get_service():
         with open(token_path, 'wb') as token:
             pickle.dump(creds, token)
 
-    service = build('sheets', 'v4', credentials=creds)
+    service = build('sheets', 'v4', credentials=creds, cache_discovery=False)
     return service
 
 

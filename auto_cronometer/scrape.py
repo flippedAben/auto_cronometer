@@ -19,14 +19,17 @@ def clean_ingredients_data(data):
     """
     Destructively cleans data.
     """
-    data[0].append('Weight Unit')
+    header_row = data[0]
+    header_row.append('Weight Unit')
+    amount_i = header_row.index('Amount')
+    weight_i = header_row.index('Weight')
     for i in range(1, len(data)):
         # Amount should be a float, not a fraction
-        data[i][1] = float(fractions.Fraction(data[i][1]))
+        data[i][amount_i] = float(fractions.Fraction(data[i][1]))
 
         # Take the unit out of weight, and put it in its own column
-        number, unit = data[i][-1].split(' ')
-        data[i][-1] = number
+        number, unit = data[i][weight_i].split(' ')
+        data[i][weight_i] = number
         data[i].append(unit)
 
 
@@ -34,6 +37,7 @@ def clean_nutrition_data(data):
     """
     Destructively cleans data coming from one of the nutrition tables.
     """
+    # This header column is blank, but it should be Unit
     data[0][2] = 'Unit'
     for i in range(1, len(data)):
         # Removing leading white space
