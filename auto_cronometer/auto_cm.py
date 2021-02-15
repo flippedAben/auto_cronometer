@@ -8,7 +8,6 @@ from selenium.common.exceptions import (
 import os
 import logging
 
-logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger(__name__)
 
 
