@@ -6,6 +6,7 @@ from collections import defaultdict
 
 def get_grocery_list():
     # Get ingredients data
+    header_row = []
     favorite_recipe_data = []
     for recipe_dir in glob.glob('./data/*'):
         with open(f'{recipe_dir}/metadata.json', 'r') as f:
@@ -14,14 +15,21 @@ def get_grocery_list():
             with open(f'{recipe_dir}/ingredients.csv') as f:
                 reader = csv.reader(f)
                 rows = [row for row in reader]
+                if not header_row:
+                    header_row = rows[0]
+
                 # Ignore the header row (i.e. first row)
                 favorite_recipe_data.extend(rows[1:])
 
     # Group by 'Description'
+    description_i = header_row.index('Description')
     # Only keep 'Amount' and 'Unit' data
+    amount_i = header_row.index('Amount')
+    unit_i = header_row.index('Unit')
     ingredients = defaultdict(list)
     for row in favorite_recipe_data:
-        ingredients[row[0]].append(row[1:3])
+        amount_unit_data = [row[amount_i], row[unit_i]]
+        ingredients[row[description_i]].append(amount_unit_data)
 
     grocery_list = []
     grocery_list.append(['Item', 'Amount', 'Unit', 'Order'])

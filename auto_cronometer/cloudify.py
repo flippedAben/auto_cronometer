@@ -68,6 +68,7 @@ def update_groceries(sheet, metadata):
     """
     Put grocery list data on the cloud.
     """
+    print('Updating grocery sheet...')
     sheet_name = 'List'
 
     # Clear the existing grocery list
@@ -89,7 +90,7 @@ def update_groceries(sheet, metadata):
             if not metadata[item][2]:
                 out_of_stock_data.append(row)
         else:
-            print(f'{item} is not in the Metadata sheet. Add it.')
+            print(f'Not in the Metadata sheet: {item}')
 
     # Apply an ordering if it exists
     for row in out_of_stock_data:
