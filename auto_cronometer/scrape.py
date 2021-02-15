@@ -25,7 +25,7 @@ def clean_ingredients_data(data):
     weight_i = header_row.index('Weight')
     for i in range(1, len(data)):
         # Amount should be a float, not a fraction
-        data[i][amount_i] = float(fractions.Fraction(data[i][1]))
+        data[i][amount_i] = float(fractions.Fraction(data[i][amount_i]))
 
         # Take the unit out of weight, and put it in its own column
         number, unit = data[i][weight_i].split(' ')
