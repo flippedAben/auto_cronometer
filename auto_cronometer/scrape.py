@@ -105,7 +105,7 @@ def scrape_recipes():
                 'original_name': recipe_name,
                 'is_favorite': ac.is_recipe_favorite(recipe_details)
             }
-            print(metadata)
+            print(recipe_name)
 
             with open(f'{recipe_data_dir}/metadata.json', 'w') as f:
                 json.dump(metadata, f)

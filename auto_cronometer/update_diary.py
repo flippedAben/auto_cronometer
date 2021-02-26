@@ -28,4 +28,3 @@ def add_starred_recipes_to_diary():
                 add_recipe_button = ac.driver.find_element_by_class_name(
                     'btn-orange-flat')
                 ac.robust_click(add_recipe_button)
-    print()

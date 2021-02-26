@@ -71,18 +71,12 @@ def update_groceries(sheet, metadata):
     print('Updating grocery sheet...')
     sheet_name = 'List'
 
-    # Clear the existing grocery list
-    sheet.values().clear(
-        spreadsheetId=SHEET_ID,
-        range=f'{sheet_name}!A:D',
-        body={}
-    ).execute()
-
     # Read the local grocery list from ingredients.csv files
     # Ignore the header
     data = grocery_list.get_grocery_list()[1:]
 
     # Ignore items that are "in stock" (i.e. we already have enough)
+    no_metadata_items = []
     out_of_stock_data = []
     for row in data:
         item = row[0]
@@ -90,7 +84,20 @@ def update_groceries(sheet, metadata):
             if not metadata[item][2]:
                 out_of_stock_data.append(row)
         else:
-            print(f'Not in the Metadata sheet: {item}')
+            no_metadata_items.append(item)
+
+    if no_metadata_items:
+        print('[Error] Upload failed. These items have no metadata. Add.')
+        for item in no_metadata_items:
+            print(' ' * 4 + item)
+        exit(1)
+
+    # Clear the existing grocery list
+    sheet.values().clear(
+        spreadsheetId=SHEET_ID,
+        range=f'{sheet_name}!A:D',
+        body={}
+    ).execute()
 
     # Apply an ordering if it exists
     for row in out_of_stock_data:
