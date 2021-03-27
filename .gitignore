@@ -1,5 +1,6 @@
 config.sh
 data/**
+raw_htmls/**
 dist/**
 setup_files/**
 */__pycache__/**
