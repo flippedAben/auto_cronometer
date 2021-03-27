@@ -1,25 +1,28 @@
 import json
-import glob
-import csv
+import yaml
 from collections import defaultdict
 
 
-def get_grocery_list():
-    # Get ingredients data
-    header_row = []
-    favorite_recipe_data = []
-    for recipe_dir in glob.glob('./data/*'):
-        with open(f'{recipe_dir}/metadata.json', 'r') as f:
-            json_data = json.load(f)
-        if json_data['is_favorite']:
-            with open(f'{recipe_dir}/ingredients.csv') as f:
-                reader = csv.reader(f)
-                rows = [row for row in reader]
-                if not header_row:
-                    header_row = rows[0]
+def get_grocery_list(data_dir):
+    # Get the active recipes list
+    with open('active.yaml', 'r') as f:
+        active_recipes = yaml.load(f, Loader=yaml.Loader)
 
-                # Ignore the header row (i.e. first row)
-                favorite_recipe_data.extend(rows[1:])
+    header_row = []
+    recipe_data = []
+    # Get ingredients data
+    for active_recipe in active_recipes:
+        recipe_id = active_recipe['id']
+        with open(f'{data_dir}/recipe_{recipe_id}.json', 'r') as f:
+            json_data = json.load(f)
+
+            ingredients = json_data['ingredients']
+            rows = [row for row in ingredients]
+            if not header_row:
+                header_row = rows[0]
+
+            # Ignore the header row (i.e. first row)
+            recipe_data.extend(rows[1:])
 
     # Group by 'Description'
     description_i = header_row.index('Description')
@@ -27,7 +30,7 @@ def get_grocery_list():
     amount_i = header_row.index('Amount')
     unit_i = header_row.index('Unit')
     ingredients = defaultdict(list)
-    for row in favorite_recipe_data:
+    for row in recipe_data:
         amount_unit_data = [row[amount_i], row[unit_i]]
         ingredients[row[description_i]].append(amount_unit_data)
 
@@ -46,4 +49,5 @@ def get_grocery_list():
 
 
 if __name__ == '__main__':
-    get_grocery_list()
+    for row in get_grocery_list('data'):
+        print(row)

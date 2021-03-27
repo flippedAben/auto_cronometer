@@ -9,7 +9,6 @@ import auto_cronometer.grocery_list as grocery_list
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-
 SHEET_ID = os.environ.get('google_sheets_api_sheet_id')
 
 
@@ -23,7 +22,7 @@ def get_service():
         with open(token_path, 'rb') as token:
             creds = pickle.load(token)
     # If there are no (valid) credentials available, let the user log in.
-    if not creds or not creds.valid:
+    if (creds and not creds.valid) or not creds:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
@@ -73,7 +72,7 @@ def update_groceries(sheet, metadata):
 
     # Read the local grocery list from ingredients.csv files
     # Ignore the header
-    data = grocery_list.get_grocery_list()[1:]
+    data = grocery_list.get_grocery_list('data')[1:]
 
     # Ignore items that are "in stock" (i.e. we already have enough)
     no_metadata_items = []
@@ -87,9 +86,9 @@ def update_groceries(sheet, metadata):
             no_metadata_items.append(item)
 
     if no_metadata_items:
-        print('[Error] Upload failed. These items have no metadata. Add.')
+        print('[Error] Upload failed. These items have no metadata. Add:\n')
         for item in no_metadata_items:
-            print(' ' * 4 + item)
+            print(item)
         exit(1)
 
     # Clear the existing grocery list

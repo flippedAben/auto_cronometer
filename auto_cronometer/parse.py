@@ -2,7 +2,9 @@ import fractions
 import json
 import os
 import re
+import yaml
 from bs4 import BeautifulSoup
+from tqdm import tqdm
 
 
 def parse_table(table):
@@ -56,7 +58,7 @@ def parse_recipe_htmls(html_dir, out_dir):
     cronometer_id_re = re.compile(r'Recipe #(\d+),.*')
 
     htmls = os.listdir(html_dir)
-    for html in htmls:
+    for html in tqdm(htmls):
         recipe_json = {}
         recipe_html_id = int(os.path.splitext(html)[0].split('_')[1])
         recipe_json['html_id'] = recipe_html_id
@@ -73,11 +75,6 @@ def parse_recipe_htmls(html_dir, out_dir):
                 'div',
                 {'class': 'admin-food-name'})
             recipe_json['name'] = recipe_name.text
-
-            star_img = main_div.find(
-                'img',
-                {'title': 'Add to favorites'})
-            recipe_json['favorite'] = 'star_unselected' not in star_img['src']
 
             recipe_number = main_div.find(lambda x: 'Recipe #' in x.text)
             match = cronometer_id_re.match(recipe_number.text)

@@ -1,9 +1,14 @@
 import os
-
+import yaml
 import auto_cronometer.auto_cm as auto_cm
 
 
-def add_starred_recipes_to_diary():
+def add_active_recipes_to_diary():
+    # Get the active recipes list
+    with open('active.yaml', 'r') as f:
+        active_recipes = yaml.load(f, Loader=yaml.Loader)
+    active_names = set(x['name'] for x in active_recipes)
+
     # Enable headless Firefox
     os.environ['MOZ_HEADLESS'] = '1'
 
@@ -11,13 +16,12 @@ def add_starred_recipes_to_diary():
         ac.login()
         ac.go_to_recipes_tab()
 
-        print('Adding favorite/starred recipes to today\'s diary entry...')
+        print("Adding active recipes to today's diary entry...")
         recipes = ac.get_recipes_list_items()
         for _, recipe in enumerate(recipes):
             details = ac.get_recipe_details_pane(recipe)
-            if ac.is_recipe_favorite(details):
-                print(ac.get_recipe_title(details).text)
-
+            name = ac.get_recipe_title(details).text
+            if name in active_names:
                 # Should be the first button found in the details pane
                 add_to_diary_button = details.find_element_by_tag_name(
                     'button')

@@ -92,16 +92,33 @@ class AutoCronometer():
         return grand_parent
 
     def get_recipe_page_sources(self, print_progress=False):
-        recipes = self._get_recipes_list_items()
+        recipes = self.get_recipes_list_items()
         htmls = []
         for recipe in tqdm(recipes):
             self.robust_click(recipe)
             # Wait for page to fully load
-            self.wait_on_ele_class('admin-food-name')
+            self.wait_on_ele_class('admin-food-editor-content-area')
             htmls.append(self.driver.page_source)
         return htmls
 
-    def _get_recipes_list_items(self):
+    def get_recipe_details_pane(self, recipe_list_item):
+        # Click on the recipe list item to show the pane
+        self.robust_click(recipe_list_item)
+        self.wait_on_ele_class('admin-food-name')
+
+        # Get the details
+        parent = self.get_recipes_tab_page()
+        recipe_details_pane = parent.find_element_by_class_name(
+            'admin-food-editor-content-area')
+        return recipe_details_pane
+
+    def get_recipe_title(self, recipe_details_pane):
+        admin_food_name = recipe_details_pane.find_element_by_class_name(
+            'admin-food-name')
+        recipe_title_div = admin_food_name.find_element_by_xpath('..')
+        return recipe_title_div
+
+    def get_recipes_list_items(self):
         parent = self.get_recipes_tab_page()
         temp = parent.find_element_by_class_name('inline')
         temp = temp.find_element_by_tag_name('div')
