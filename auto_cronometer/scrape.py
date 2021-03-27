@@ -33,6 +33,15 @@ def clean_ingredients_data(data):
         data[i].append(unit)
 
 
+def ingredients_table_to_csv(table, clean_data_func, out_dir):
+    data = parse_table(table)
+    clean_data_func(data)
+    with open(f'{out_dir}/ingredients.csv', 'w') as f:
+        writer = csv.writer(f, quoting=csv.QUOTE_MINIMAL)
+        for row in data:
+            writer.writerow(row)
+
+
 def clean_nutrition_data(data):
     """
     Destructively cleans data coming from one of the nutrition tables.
@@ -42,15 +51,6 @@ def clean_nutrition_data(data):
     for i in range(1, len(data)):
         # Removing leading white space
         data[i][0] = data[i][0].strip()
-
-
-def ingredients_table_to_csv(table, clean_data_func, out_dir):
-    data = parse_table(table)
-    clean_data_func(data)
-    with open(f'{out_dir}/ingredients.csv', 'w') as f:
-        writer = csv.writer(f, quoting=csv.QUOTE_MINIMAL)
-        for row in data:
-            writer.writerow(row)
 
 
 def nutrition_table_to_csv(table, clean_data_func, out_dir):
@@ -77,7 +77,7 @@ def normalize_recipe_name(raw_recipe_name):
     return normalized_name
 
 
-def scrape_recipes():
+def scrape_recipes(all_data):
     # Enable headless Firefox
     os.environ['MOZ_HEADLESS'] = '1'
 
@@ -118,11 +118,12 @@ def scrape_recipes():
                 recipe_data_dir
             )
 
-            # The nutrition tables have similar structure
-            for nutrition_table in tables[2:]:
-                # Assume the top left entry is the table name
-                nutrition_table_to_csv(
-                    nutrition_table,
-                    clean_nutrition_data,
-                    recipe_data_dir
-                )
+            if all_data:
+                # The nutrition tables have similar structure
+                for nutrition_table in tables[2:]:
+                    # Assume the top left entry is the table name
+                    nutrition_table_to_csv(
+                        nutrition_table,
+                        clean_nutrition_data,
+                        recipe_data_dir
+                    )

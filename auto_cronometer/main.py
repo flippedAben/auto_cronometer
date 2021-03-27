@@ -1,42 +1,31 @@
 #!/usr/bin/env python3
-import argparse
+"""Usage:
+    auto_cm scrape [--all]
+    auto_cm diary
+    auto_cm cloud
 
+Automate food/nutrition bookkeeping tasks.
+
+Commands:
+    scrape    Scrape Cronometer's website for ingredient information. By
+              default, scrapes the ingredients only.
+    diary     Add current set of favorite recipes to today's diary
+    cloud     Put the grocery list on the cloud
+
+"""
+from docopt import docopt
 import auto_cronometer.scrape as scrape
 import auto_cronometer.update_diary as update_diary
 import auto_cronometer.cloudify as cloudify
 
 
-class AutoCMParser(argparse.ArgumentParser):
-    def error(self, message):
-        self.print_help()
-
-
-description_help = """
-Automate food/nutrition bookkeeping tasks
-
-Supported commands
-
-    scrape: scrape Cronometer's recipe ingredients into a CSV
-    diary:  add current set of favorite recipes to today's diary
-    cloud:  put the grocery list on the cloud
-
-"""
-
-
 def main():
-    parser = AutoCMParser(
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        description=description_help
-    )
-    parser.add_argument(
-        'command',
-    )
-    args = parser.parse_args()
-    if args.command == 'scrape':
-        scrape.scrape_recipes()
-    elif args.command == 'diary':
+    args = docopt(__doc__)
+    if args['scrape']:
+        scrape.scrape_recipes(args['--all'])
+    elif args['diary']:
         update_diary.add_starred_recipes_to_diary()
-    elif args.command == 'cloud':
+    elif args['cloud']:
         cloudify.upload_grocery_list()
 
 
