@@ -22,6 +22,7 @@ def add_active_recipes_to_diary():
             details = ac.get_recipe_details_pane(recipe)
             name = ac.get_recipe_title(details).text
             if name in active_names:
+                print(name)
                 # Should be the first button found in the details pane
                 add_to_diary_button = details.find_element_by_tag_name(
                     'button')
