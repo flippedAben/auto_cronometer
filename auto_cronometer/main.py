@@ -36,7 +36,6 @@ def main():
         parse.parse_recipe_htmls(
             args['<html_dir>'],
             args['--json_dir'],
-            args['--init_active_yaml'],
         )
     elif args['diary']:
         update_diary.add_active_recipes_to_diary()
