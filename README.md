@@ -38,6 +38,12 @@ You only need this if you want a grocery list.
 
 Basically follow the instructions on [the Google Sheets API v4 Quickstart page](https://developers.google.com/sheets/api/quickstart/python).
 
+### Generate a service account JSON
+
+- Create a service account [here](https://console.cloud.google.com/iam-admin/serviceaccounts).
+- Create a key for the service account.
+    - Download the key as a JSON file into `setup_files`.
+
 ### Create `config.sh`
 
 This file should look like this:
@@ -47,8 +53,8 @@ geckodriver_path=<path to geckodriver>
 cronometer_user=<cronometer username>
 cronometer_pass=<cronometer password>
 google_sheets_api_sheet_id=<existing google sheet that will contain the grocery list>
-google_sheets_api_client_id_path=<path to client_id.json>
-google_sheets_api_token_pickle_path=<path to token.pickle>
+export google_sheets_api_sheet_id=<the sheet you want to edit>
+export GOOGLE_APPLICATION_CREDENTIALS=<path to your JSON file>
 ```
 
 Don't share it with anyone. Apply your own security measures.

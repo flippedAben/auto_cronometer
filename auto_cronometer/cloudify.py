@@ -1,41 +1,22 @@
-import pickle
 import os
 import os.path
+from google.oauth2 import service_account
 from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
 
 import auto_cronometer.grocery_list as grocery_list
 
-# If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 SHEET_ID = os.environ.get('google_sheets_api_sheet_id')
 
 
 def get_service():
-    creds = None
-    # The file token.pickle stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
-    token_path = os.environ.get('google_sheets_api_token_pickle_path')
-    if os.path.exists(token_path):
-        with open(token_path, 'rb') as token:
-            creds = pickle.load(token)
-    # If there are no (valid) credentials available, let the user log in.
-    if (creds and not creds.valid) or not creds:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            client_path = os.environ.get('google_sheets_api_client_id_path')
-            flow = InstalledAppFlow.from_client_secrets_file(
-                client_path,
-                SCOPES)
-            creds = flow.run_local_server(port=0)
-        # Save the credentials for the next run
-        with open(token_path, 'wb') as token:
-            pickle.dump(creds, token)
-
-    service = build('sheets', 'v4', credentials=creds, cache_discovery=False)
+    credentials = service_account.Credentials.from_service_account_file(
+        os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'))
+    service = build(
+        'sheets',
+        'v4',
+        credentials=credentials.with_scopes(SCOPES),
+        cache_discovery=False)
     return service
 
 
