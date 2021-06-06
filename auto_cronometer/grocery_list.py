@@ -7,7 +7,7 @@ def get_grocery_list(data_dir):
     with open('active.yaml', 'r') as f:
         active_recipes = yaml.load(f, Loader=yaml.Loader)
 
-    with open('{data_dir}/recipe_name_to_id.json', 'r') as f:
+    with open(f'{data_dir}/recipe_name_to_id.json', 'r') as f:
         recipe_name_to_id = json.load(f)
 
     header_row = []
