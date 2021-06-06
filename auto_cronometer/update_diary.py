@@ -6,8 +6,7 @@ import auto_cronometer.auto_cm as auto_cm
 def add_active_recipes_to_diary():
     # Get the active recipes list
     with open('active.yaml', 'r') as f:
-        active_recipes = yaml.load(f, Loader=yaml.Loader)
-    active_names = set(x['name'] for x in active_recipes)
+        active_names = yaml.load(f, Loader=yaml.Loader)
 
     # Enable headless Firefox
     os.environ['MOZ_HEADLESS'] = '1'

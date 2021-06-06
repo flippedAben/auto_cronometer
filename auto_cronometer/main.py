@@ -4,20 +4,20 @@
     autocm parse <html_dir> [--json_dir DIR]
     autocm diary
     autocm cloud
-    autocm active_yaml <data_dir>
+    autocm active <data_dir>
 
 Automate food/nutrition bookkeeping tasks.
 
 Commands:
-    scrape       Scrape Cronometer's website for recipe HTMLs.
-    parse        Parse scraped HTMLs in <html_dir> into JSON files.
-    diary        Add current set of favorite recipes to today's diary.
-    cloud        Put the grocery list on the cloud.
-    active_yaml  Initialize a active.yaml file. All recipes included.
+    scrape    Scrape Cronometer's website for recipe HTMLs.
+    parse     Parse scraped HTMLs in <html_dir> into JSON files.
+    diary     Add current set of favorite recipes to today's diary.
+    cloud     Put the grocery list on the cloud.
+    active    Initialize a active.yaml file. All recipes included.
 
 Options:
-    --html_dir DIR      Store the HTMLs in DIR [default: raw_htmls]
-    --json_dir DIR      Store the JSONs in DIR [default: data]
+    --html_dir DIR    Store the HTMLs in DIR [default: raw_htmls]
+    --json_dir DIR    Store the JSONs in DIR [default: data]
 
 """
 from docopt import docopt
@@ -41,7 +41,7 @@ def main():
         update_diary.add_active_recipes_to_diary()
     elif args['cloud']:
         cloudify.upload_grocery_list()
-    elif args['active_yaml']:
+    elif args['active']:
         active_yaml.create_active_yaml(args['<data_dir>'])
 
 

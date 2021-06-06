@@ -4,15 +4,17 @@ from collections import defaultdict
 
 
 def get_grocery_list(data_dir):
-    # Get the active recipes list
     with open('active.yaml', 'r') as f:
         active_recipes = yaml.load(f, Loader=yaml.Loader)
+
+    with open('{data_dir}/recipe_name_to_id.json', 'r') as f:
+        recipe_name_to_id = json.load(f)
 
     header_row = []
     recipe_data = []
     # Get ingredients data
     for active_recipe in active_recipes:
-        recipe_id = active_recipe['id']
+        recipe_id = recipe_name_to_id[active_recipe]
         with open(f'{data_dir}/recipe_{recipe_id}.json', 'r') as f:
             json_data = json.load(f)
 

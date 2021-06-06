@@ -2,7 +2,6 @@ import fractions
 import json
 import os
 import re
-import yaml
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 
@@ -28,7 +27,7 @@ def clean_ingredients_data(data):
     header_row.append('Weight Unit')
     amount_i = header_row.index('Amount')
     weight_i = header_row.index('Weight')
-    calories_i = header_row.index('Calories')
+    calories_i = header_row.index('Energy (kcal)')
     for i in range(1, len(data)):
         # Amount should be a float, not a fraction
         data[i][amount_i] = float(fractions.Fraction(data[i][amount_i]))
@@ -57,6 +56,7 @@ def parse_recipe_htmls(html_dir, out_dir):
 
     cronometer_id_re = re.compile(r'Recipe #(\d+),.*')
 
+    recipe_name_to_id = {}
     htmls = os.listdir(html_dir)
     for html in tqdm(htmls):
         recipe_json = {}
@@ -81,6 +81,9 @@ def parse_recipe_htmls(html_dir, out_dir):
             if match:
                 cronometer_id = match.group(1)
                 recipe_json['cronometer_id'] = cronometer_id
+                recipe_name_to_id[recipe_json['name']] = cronometer_id
+            else:
+                print('Failed to find cronometer_id for ' + recipe_name)
 
             tables = main_div.find_all(
                 'table',
@@ -100,3 +103,6 @@ def parse_recipe_htmls(html_dir, out_dir):
 
         with open(f'{out_dir}/recipe_{cronometer_id}.json', 'w') as f:
             json.dump(recipe_json, f)
+
+    with open(f'{out_dir}/recipe_name_to_id.json', 'w') as f:
+        json.dump(recipe_name_to_id, f)
