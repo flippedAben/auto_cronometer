@@ -2,6 +2,7 @@ import fractions
 import json
 import os
 import re
+import shutil
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 
@@ -52,7 +53,8 @@ def clean_nutrition_data(data):
 
 
 def parse_recipe_htmls(html_dir, out_dir):
-    os.makedirs(out_dir, exist_ok=True)
+    shutil.rmtree(out_dir, ignore_errors=True)
+    os.makedirs(out_dir)
 
     cronometer_id_re = re.compile(r'Recipe #(\d+),.*')
 

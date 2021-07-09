@@ -1,12 +1,14 @@
 import os
 import auto_cronometer.auto_cm as auto_cm
+import shutil
 
 
 def scrape_recipes(out_dir):
     # Enable headless Firefox
     os.environ['MOZ_HEADLESS'] = '1'
 
-    os.makedirs(out_dir, exist_ok=True)
+    shutil.rmtree(out_dir, ignore_errors=True)
+    os.makedirs(out_dir)
     with auto_cm.AutoCronometer() as ac:
         ac.login()
         ac.go_to_recipes_tab()
